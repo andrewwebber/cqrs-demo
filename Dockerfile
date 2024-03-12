@@ -1,4 +1,8 @@
-FROM public.ecr.aws/lambda/provided:al2
-ENV RUST_BACKTRACE=1
-COPY target/x86_64-unknown-linux-musl/release/bootstrap ${LAMBDA_RUNTIME_DIR}
-CMD [ "cqrs.handler" ]
+FROM alpine:3 as certs
+RUN apk --update add ca-certificates
+
+FROM scratch
+COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY ./target/x86_64-unknown-linux-musl/release/cqrs-demo* /usr/local/bin/
+EXPOSE 8080
+ENTRYPOINT ["cqrs-demo"]

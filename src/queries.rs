@@ -1,11 +1,11 @@
 use async_trait::async_trait;
 use cqrs_es::persist::GenericQuery;
 use cqrs_es::{EventEnvelope, Query, View};
-use postgres_es::PostgresViewRepository;
 use serde::{Deserialize, Serialize};
 
 use crate::domain::aggregate::BankAccount;
 use crate::domain::events::BankAccountEvent;
+use nats_es::views_repository::NatsViewRepository;
 
 pub struct SimpleLoggingQuery {}
 
@@ -24,11 +24,8 @@ impl Query<BankAccount> for SimpleLoggingQuery {
 // Our second query, this one will be handled with Postgres `GenericQuery`
 // which will serialize and persist our view after it is updated. It also
 // provides a `load` method to deserialize the view on request.
-pub type AccountQuery = GenericQuery<
-    PostgresViewRepository<BankAccountView, BankAccount>,
-    BankAccountView,
-    BankAccount,
->;
+pub type AccountQuery =
+    GenericQuery<NatsViewRepository<BankAccountView, BankAccount>, BankAccountView, BankAccount>;
 
 // The view for a BankAccount query, for a standard http application this should
 // be designed to reflect the response dto that will be returned to a user.

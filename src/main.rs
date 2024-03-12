@@ -5,6 +5,7 @@ use cqrs_demo::state::new_application_state;
 
 #[tokio::main]
 async fn main() {
+    dotenvy::dotenv().ok();
     let state = new_application_state().await;
     // Configure the Axum routes and services.
     // For this example a single logical endpoint is used and the HTTP method
